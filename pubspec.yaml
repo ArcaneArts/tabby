@@ -1,0 +1,15 @@
+name: tabby
+description: "Tabs for Bottom Nav Bar or Nav Rail depending on width."
+version: 1.0.0
+repository: https://github.com/ArcaneArts/tabby
+environment:
+  sdk: '>=3.3.3 <4.0.0'
+  flutter: ">=1.17.0"
+dependencies:
+  flutter:
+    sdk: flutter
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.2
+flutter:
