@@ -1,6 +1,6 @@
 name: tabby
 description: "Tabs for Bottom Nav Bar or Nav Rail depending on width."
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/ArcaneArts/tabby
 environment:
   sdk: '>=3.3.3 <4.0.0'
