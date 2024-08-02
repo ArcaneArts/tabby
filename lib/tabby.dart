@@ -28,7 +28,8 @@ class TabbyTab {
         activeIcon: selectedIcon == null ? null : Icon(selectedIcon),
       );
 
-  NavigationRailDestination get destination => NavigationRailDestination(
+  NavigationRailDestination destination(Tabby tabby) =>
+      NavigationRailDestination(
         icon: Icon(icon),
         selectedIcon: selectedIcon == null ? null : Icon(selectedIcon),
         label: Text(label),
@@ -40,13 +41,15 @@ class Tabby extends StatefulWidget {
   final int initialIndex;
   final Function(int)? onIndexChanged;
   final double widthThreshold;
-  final bool? showLabels;
+  final bool showLabels;
+  final BottomNavigationBarType? bottomNavigationBarType;
 
   const Tabby(
       {super.key,
-      this.showLabels,
+      this.showLabels = true,
       required this.tabs,
       this.initialIndex = 0,
+      this.bottomNavigationBarType,
       this.onIndexChanged,
       this.widthThreshold = 600});
 
@@ -96,7 +99,8 @@ class TabbyState extends State<Tabby> {
               children: [
                 NavigationRail(
                     onDestinationSelected: setTab,
-                    destinations: tabs.map((e) => e.destination).toList(),
+                    destinations:
+                        tabs.map((e) => e.destination(widget)).toList(),
                     selectedIndex: index),
                 Expanded(child: buildTab(context, index))
               ],
@@ -104,6 +108,17 @@ class TabbyState extends State<Tabby> {
           : Scaffold(
               body: buildTab(context, index),
               bottomNavigationBar: BottomNavigationBar(
+                type: widget.bottomNavigationBarType,
+                selectedItemColor: Theme.of(context).colorScheme.primary,
+                unselectedItemColor: Theme.of(context).colorScheme.onSurface,
+                selectedLabelStyle: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .copyWith(color: Theme.of(context).colorScheme.primary),
+                unselectedLabelStyle: Theme.of(context).textTheme.labelMedium,
+                selectedIconTheme:
+                    IconThemeData(color: Theme.of(context).colorScheme.primary),
+                unselectedIconTheme: Theme.of(context).iconTheme,
                 showSelectedLabels: widget.showLabels,
                 showUnselectedLabels: widget.showLabels,
                 currentIndex: index,
