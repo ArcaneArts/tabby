@@ -1,3 +1,7 @@
+## 2.0.0
+
+* Overhaul
+
 ## 1.0.3
 
 * Used Indexed stacks
