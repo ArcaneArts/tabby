@@ -1,3 +1,7 @@
+## 1.0.3
+
+* Used Indexed stacks
+
 ## 1.0.2
 
 * Fix theme issues on shifting bottom bar
