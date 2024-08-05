@@ -87,10 +87,18 @@ class TabbyState extends State<Tabby> {
     }
   }
 
-  Widget buildTab(BuildContext context, int index) =>
-      tabs[index].builder?.call(context) ??
-      tabs[index].child ??
-      const SizedBox.shrink();
+  Widget buildTab(BuildContext context, int index) => IndexedStack(
+        index: index,
+        children: [
+          for (var tab in tabs)
+            if (tab.builder != null)
+              tab.builder!(context)
+            else if (tab.child != null)
+              tab.child!
+            else
+              const SizedBox.shrink(),
+        ],
+      );
 
   @override
   Widget build(BuildContext context) =>
