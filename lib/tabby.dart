@@ -61,7 +61,7 @@ extension XTabList on List<TabbyTab> {
 }
 
 BottomNavigationBar _defaultTabbyScaffoldBottomNavigationBarBuilder(
-        BuildContext context, TabbyScaffoldState state) =>
+        BuildContext context, TabbyState state) =>
     BottomNavigationBar(
       currentIndex: state.currentIndex,
       onTap: (index) => state.currentIndex = index,
@@ -78,7 +78,7 @@ BottomNavigationBar _defaultTabbyScaffoldBottomNavigationBarBuilder(
     );
 
 Widget _defaultTabbyScaffoldNavigationRailBuilder(
-        BuildContext context, TabbyScaffoldState state) =>
+        BuildContext context, TabbyState state) =>
     Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -103,7 +103,7 @@ Widget _defaultTabbyScaffoldNavigationRailBuilder(
     );
 
 Widget _defaultTabbyScaffoldTopTabsBuilder(
-        BuildContext context, TabbyScaffoldState state) =>
+        BuildContext context, TabbyState state) =>
     TabBarView(
       children: state.widget.tabs
           .map((tab) => state.buildBody(context, tab))
@@ -111,7 +111,7 @@ Widget _defaultTabbyScaffoldTopTabsBuilder(
     );
 
 PreferredSizeWidget _defaultTabbyScaffoldTopTabsAppBarBottomBuilder(
-        BuildContext context, TabbyScaffoldState state) =>
+        BuildContext context, TabbyState state) =>
     TabBar(
       onTap: (index) => state.currentIndex = index,
       tabs: state.widget.tabs
@@ -144,27 +144,35 @@ PreferredSizeWidget _defaultTabbyScaffoldTopTabsAppBarBottomBuilder(
     );
 
 Widget _defaultTabbyScaffoldDrawerBuilder(
-        BuildContext context, TabbyScaffoldState state) =>
+        BuildContext context, TabbyState state) =>
     Drawer(
-      child: ListView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          ...state.widget.drawerHeaders,
-          ...state.widget.tabs.map((tab) => ListTile(
-                leading: Icon(
-                    state.currentId == tab.id ? tab.selectedIcon : tab.icon),
-                title: Text(tab.label),
-                onTap: () {
-                  state.currentId = tab.id;
-                  state.expanded = false;
-                },
-              )),
-          ...state.widget.drawerFooters,
+          Expanded(
+              child: ListView(
+            children: [
+              ...state.widget.drawerHeaders,
+              ...state.widget.tabs.map((tab) => ListTile(
+                    leading: Icon(state.currentId == tab.id
+                        ? tab.selectedIcon
+                        : tab.icon),
+                    title: Text(tab.label),
+                    onTap: () {
+                      state.currentId = tab.id;
+                      state.expanded = false;
+                    },
+                  )),
+              ...state.widget.drawerFooters,
+            ],
+          ))
         ],
       ),
     );
 
 Widget _defaultTabbyScaffoldSidebarBuilder(
-        BuildContext context, TabbyScaffoldState state) =>
+        BuildContext context, TabbyState state) =>
     Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -204,7 +212,7 @@ Widget _defaultTabbyScaffoldSidebarBuilder(
 
 enum TabbyIndexingType { none, indexedStack, lazyIndexedStack }
 
-class TabbyScaffold extends StatefulWidget {
+class Tabby extends StatefulWidget {
   final TabbyType? type;
   final List<TabbyTab> tabs;
   final bool rightHanded;
@@ -213,20 +221,15 @@ class TabbyScaffold extends StatefulWidget {
   final String? initialTab;
   final ValueChanged<String>? onTabChanged;
   final NavigationRailLabelType navigationRailLabelType;
-  final BottomNavigationBar Function(
-          BuildContext context, TabbyScaffoldState state)
+  final BottomNavigationBar Function(BuildContext context, TabbyState state)
       bottomNavigationBarBuilder;
-  final Widget Function(BuildContext context, TabbyScaffoldState state)
+  final Widget Function(BuildContext context, TabbyState state)
       navigationRailBuilder;
-  final Widget Function(BuildContext context, TabbyScaffoldState state)
-      topTabsBuilder;
-  final PreferredSizeWidget Function(
-          BuildContext context, TabbyScaffoldState state)
+  final Widget Function(BuildContext context, TabbyState state) topTabsBuilder;
+  final PreferredSizeWidget Function(BuildContext context, TabbyState state)
       topTabsAppBarBottomBuilder;
-  final Widget Function(BuildContext context, TabbyScaffoldState state)
-      drawerBuilder;
-  final Widget Function(BuildContext context, TabbyScaffoldState state)
-      sidebarBuilder;
+  final Widget Function(BuildContext context, TabbyState state) drawerBuilder;
+  final Widget Function(BuildContext context, TabbyState state) sidebarBuilder;
   final bool topTabLabels;
   final bool topTabIcons;
   final bool inlineTabs;
@@ -237,7 +240,7 @@ class TabbyScaffold extends StatefulWidget {
   final List<Widget> sidebarHeaders;
   final List<Widget> sidebarFooters;
 
-  const TabbyScaffold({
+  const Tabby({
     super.key,
     this.type,
     required this.tabs,
@@ -266,17 +269,19 @@ class TabbyScaffold extends StatefulWidget {
     this.sidebarBuilder = _defaultTabbyScaffoldSidebarBuilder,
   }) : assert(tabs.length >= 2, "TabbyScaffold requires at least 2 tabs");
 
-  TabbyScaffoldState of(BuildContext context) =>
-      context.findAncestorStateOfType<TabbyScaffoldState>()!;
+  TabbyState of(BuildContext context) =>
+      context.findAncestorStateOfType<TabbyState>()!;
 
   @override
-  State<TabbyScaffold> createState() => TabbyScaffoldState();
+  State<Tabby> createState() => TabbyState();
 }
 
-class TabbyScaffoldState extends State<TabbyScaffold> {
+class TabbyState extends State<Tabby> {
+  late TabController _tabController;
   late GlobalKey<ScaffoldState> _scaffoldKey;
   late String _currentId;
   String get currentId => _currentId;
+
   set currentId(String value) {
     if (value != currentId) {
       widget.onTabChanged?.call(value);
